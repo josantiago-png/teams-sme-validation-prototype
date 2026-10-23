@@ -1,4 +1,4 @@
-import { fluentIcons } from "./icons.generated.js?v=official-fluent-icons";
+import { fluentIcons } from "./icons.generated.js?v=filled-ms-source-icons";
 
 const stackIconSrc = "./assets/stack-internal-icon.svg?v=teams-icon-mask";
 const stackIcon = `<img src="${stackIconSrc}" alt="" />`;
@@ -500,7 +500,6 @@ function renderPost(message) {
 
 function renderAdaptiveCard(message) {
   const card = message.card;
-  const sourceOpen = state.openSources.has(message.id);
   const answered = state.directAnswers[message.id];
   const confirmed = state.directCorrect.has(message.id);
   const forwarded = state.forwarded[message.id];
@@ -513,7 +512,6 @@ function renderAdaptiveCard(message) {
         <p class="card-title">${card.titleLabel ? `<span class="card-label">${card.titleLabel}</span> ` : ""}${escapeHtml(card.title)}</p>
         <p class="card-text">${card.bodyLabel ? `<span class="card-label">${card.bodyLabel}</span> ` : ""}${escapeHtml(card.body)}</p>
       </div>
-      ${card.sources?.length ? renderSources(message.id, card.sources, sourceOpen) : ""}
       ${status ? renderStatus(status, card.check || confirmed) : ""}
       ${answer ? `<button class="reply-link" data-action="open-reply-thread" data-message-id="${message.id}">1 reply · Today at 10:50 AM</button>` : ""}
       ${!status && !forwarded && !card.noAnswer ? renderActions(message) : ""}
@@ -523,23 +521,38 @@ function renderAdaptiveCard(message) {
           <button class="btn" data-action="go-channel" data-channel="${forwarded.toLowerCase()}">Open channel post</button>
         </div>
       ` : ""}
+      ${card.sources?.length ? renderSources(card.sources) : ""}
     </section>
   `;
 }
 
-function renderSources(messageId, rows, open) {
+function renderSources(rows) {
   return `
-    <button class="sources-toggle" data-action="toggle-sources" data-message-id="${messageId}" aria-expanded="${open}">
-      ${chevronDownIcon()}
-      ${rows.length} sources
-    </button>
-    ${open ? `<div class="source-list">${rows.map((row) => `
-      <div class="source-row">
-        <span class="source-icon ${row.type}">${row.type === "docs" ? filesIcon() : teamsIcon()}</span>
-        <span><strong>${escapeHtml(row.title)}</strong> · ${escapeHtml(row.meta)}</span>
+    <div class="sources-section">
+      <div class="sources-heading">${rows.length} ${rows.length === 1 ? "source" : "sources"}</div>
+      <div class="source-list">
+        ${rows.map((row) => `
+          <div class="source-row">
+            <span class="source-icon ${row.type}">${sourceIcon(row.type)}</span>
+            <span>
+              <a class="source-title" href="${sourceHref(row)}" target="_blank" rel="noopener noreferrer">${escapeHtml(row.title)}</a>
+              <span> · ${escapeHtml(row.meta)}</span>
+            </span>
+          </div>
+        `).join("")}
       </div>
-    `).join("")}</div>` : ""}
+    </div>
   `;
+}
+
+function sourceHref(row) {
+  const slug = row.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return row.type === "teams"
+    ? `https://teams.microsoft.com/l/message/${slug || "source"}`
+    : `https://www.microsoft365.com/launch/word?source=${encodeURIComponent(slug || "source")}`;
 }
 
 function renderStatus(text, check) {
@@ -617,7 +630,6 @@ function renderChannelCard(post) {
         <p class="card-title">${card.titleLabel ? `<span class="card-label">${card.titleLabel}</span> ` : ""}${escapeHtml(card.title)}</p>
         <p class="card-text">${card.bodyLabel ? `<span class="card-label">${card.bodyLabel}</span> ` : ""}${escapeHtml(card.body)}</p>
       </div>
-      ${renderSources(post.id, card.sources ?? [], state.openSources.has(post.id))}
       ${post.answered ? renderStatus("Answered by Giamir", false) : ""}
       ${post.replies?.length ? `<button class="reply-link" data-action="open-channel-thread" data-post-id="${post.id}">${post.replies.length} ${post.replies.length === 1 ? "reply" : "replies"} · Today at 10:52 AM</button>` : ""}
       ${!post.answered ? `
@@ -626,6 +638,7 @@ function renderChannelCard(post) {
           ${card.answerUnavailable ? "" : `<button class="btn" data-action="channel-correct" data-post-id="${post.id}">This is correct</button>`}
         </div>
       ` : ""}
+      ${card.sources?.length ? renderSources(card.sources) : ""}
     </section>
   `;
 }
@@ -700,8 +713,8 @@ function renderThreadCard(thread) {
         <p class="card-title">${card.titleLabel ? `<span class="card-label">${card.titleLabel}</span> ` : ""}${escapeHtml(card.title)}</p>
         <p class="card-text">${card.bodyLabel ? `<span class="card-label">${card.bodyLabel}</span> ` : ""}${escapeHtml(card.body)}</p>
       </div>
-      ${card.sources?.length ? renderSources(thread.id, card.sources, state.openSources.has(thread.id)) : ""}
       ${thread.answered ? renderStatus("Answered by Giamir", false) : ""}
+      ${card.sources?.length ? renderSources(card.sources) : ""}
       ${thread.replies?.length ? `<div class="thread-reply-count">${thread.replies.length} ${thread.replies.length === 1 ? "reply" : "replies"} · Today at ${thread.replies[0].timestamp.replace(" AM", "").replace(" PM", "")}</div>` : ""}
     </section>
   `;
@@ -855,6 +868,11 @@ function activityIcon() {
 
 function chatIcon() {
   return fluentIcon("chat");
+}
+
+function sourceIcon(type) {
+  if (type === "docs") return fluentIcon("filesFilled") || filesIcon();
+  return fluentIcon("chatFilled") || chatIcon();
 }
 
 function teamsIcon() {

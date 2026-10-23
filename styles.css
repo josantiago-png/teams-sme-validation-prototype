@@ -1012,31 +1012,20 @@ button {
   font-weight: 700;
 }
 
-.sources-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  border: 0;
-  background: transparent;
-  color: var(--teams-purple);
-  margin-top: 10px;
-  padding: 2px 0 4px;
+.sources-section {
+  margin-top: 12px;
+}
+
+.sources-heading {
+  color: var(--muted);
+  font-size: 12px;
   font-weight: 600;
-}
-
-.sources-toggle svg {
-  width: 16px;
-  height: 16px;
-  transition: transform 120ms ease;
-}
-
-.sources-toggle[aria-expanded="true"] svg {
-  transform: rotate(180deg);
+  margin-bottom: 6px;
 }
 
 .source-list {
   border-top: 1px solid var(--border);
-  margin: 2px 0 8px;
+  margin: 0 0 8px;
   padding: 8px 0 0;
   display: grid;
   gap: 6px;
@@ -1050,27 +1039,29 @@ button {
   font-size: 12px;
 }
 
+.source-title {
+  color: var(--teams-purple);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.source-title:hover {
+  color: var(--teams-purple-dark);
+  text-decoration: underline;
+}
+
 .source-icon {
   width: 20px;
   height: 20px;
-  border-radius: 3px;
   display: inline-grid;
   place-items: center;
-  color: #fff;
+  color: var(--muted);
   flex: 0 0 auto;
 }
 
 .source-icon svg {
-  width: 14px;
-  height: 14px;
-}
-
-.source-icon.docs {
-  background: #2b579a;
-}
-
-.source-icon.teams {
-  background: var(--teams-purple);
+  width: 20px;
+  height: 20px;
 }
 
 .card-actions {

@@ -8,11 +8,13 @@ const iconDir = join(root, "node_modules", "@fluentui", "svg-icons", "icons");
 const icons = {
   activity: "alert_20_regular.svg",
   chat: "chat_20_regular.svg",
+  chatFilled: "chat_20_filled.svg",
   teamsRail: { fileName: "people_team_24_color.svg", preserveColor: true },
   teams: "people_team_20_regular.svg",
   calendar: "calendar_ltr_20_regular.svg",
   calls: "call_20_regular.svg",
   files: "document_20_regular.svg",
+  filesFilled: "document_20_filled.svg",
   apps: "apps_20_regular.svg",
   addApps: "add_square_multiple_20_regular.svg",
   search: "search_20_regular.svg",
