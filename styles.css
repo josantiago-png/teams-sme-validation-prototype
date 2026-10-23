@@ -39,6 +39,16 @@ button {
   cursor: pointer;
 }
 
+.is-hidden-for-now {
+  display: none !important;
+}
+
+.card-actions [data-action="answer"],
+.card-actions .forward-menu,
+.card-actions [data-action="view-context"] {
+  display: none !important;
+}
+
 .teams-app {
   display: grid;
   grid-template-columns: 64px 320px minmax(0, 1fr);

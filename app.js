@@ -555,13 +555,13 @@ function renderActions(message) {
   const showCorrect = !message.card.answerUnavailable;
   return `
     <div class="card-actions">
-      <button class="btn btn-primary" data-action="answer" data-message-id="${message.id}">${message.card.answerUnavailable ? "Answer" : "Answer"}</button>
+      <button class="btn btn-primary is-hidden-for-now" data-action="answer" data-message-id="${message.id}">${message.card.answerUnavailable ? "Answer" : "Answer"}</button>
       ${showCorrect ? `<button class="btn" data-action="mark-correct" data-message-id="${message.id}">This is correct</button>` : ""}
-      <span class="forward-menu">
+      <span class="forward-menu is-hidden-for-now">
         <button class="btn" data-action="toggle-forward" data-message-id="${message.id}">Forward to channel</button>
         ${state.forwardMenu === message.id ? renderForwardMenu(message.id) : ""}
       </span>
-      <button class="btn" data-action="view-context">View full context</button>
+      <button class="btn is-hidden-for-now" data-action="view-context">View full context</button>
     </div>
   `;
 }
