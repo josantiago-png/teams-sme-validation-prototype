@@ -1077,7 +1077,7 @@ button {
   color: var(--muted);
   display: flex;
   font-size: 12px;
-  gap: 8px;
+  gap: 4px;
   line-height: 16px;
   margin-top: 10px;
 }
