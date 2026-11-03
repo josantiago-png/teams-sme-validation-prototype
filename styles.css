@@ -1072,6 +1072,22 @@ button {
   padding-top: 10px;
 }
 
+.auto-forward-note {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 12px;
+  gap: 8px;
+  line-height: 16px;
+  margin-top: 10px;
+}
+
+.auto-forward-note svg {
+  flex: 0 0 auto;
+  height: 16px;
+  width: 16px;
+}
+
 .btn {
   min-height: 32px;
   border-radius: 4px;

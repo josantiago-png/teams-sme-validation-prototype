@@ -54,6 +54,7 @@ const smeMessages = [
     card: {
       title: "What is the latest team structure for the Cloud Infra department?",
       body: "Based on only one source from a while back, Cloud Infra is organized into a flat structure consisting of 15 generalist engineers. It would be good to double check.",
+      autoForwardTo: "Priya Kapoor",
       sources: [{ type: "docs", title: "Cloud Infra org structure overview", meta: "Alex Chen · Dec. 5, 2025" }]
     }
   },
@@ -65,6 +66,7 @@ const smeMessages = [
       title: "Where is the Cloud Infra weekly capacity plan documented?",
       body: "I could not find anything related to your question.",
       answerUnavailable: true,
+      autoForwardTo: "Drew Reese",
       sources: [{ type: "teams", title: "Capacity plan request", meta: "Microsoft Teams · Today at 10:17 AM" }]
     }
   },
@@ -75,6 +77,7 @@ const smeMessages = [
     card: {
       title: "Should we resolve the service mesh timeout issue by increasing retries?",
       body: "Increasing retries can help with short transient failures, but it should not be the only fix. The safer approach is to validate timeout budgets, add circuit breaker limits, and only raise retries after confirming the upstream service can absorb the extra load.",
+      autoForwardTo: "Maya Ortiz",
       sources: sources.mesh
     }
   },
@@ -85,6 +88,7 @@ const smeMessages = [
     card: {
       title: "What is the recommended plan for migrating the Cloud Infra alert pipeline without missing critical pages?",
       body: "Use a staged migration: freeze alert rule edits, export current PagerDuty routing rules, run the new pipeline in shadow mode, compare parity for two business days, and cut over during a staffed support window.",
+      autoForwardTo: "Brandon Rogers",
       sources: sources.alert
     }
   },
@@ -97,6 +101,7 @@ const smeMessages = [
       title: projectYakQuestion,
       bodyLabel: "Response:",
       body: projectYakResponse,
+      autoForwardTo: "Alex Chen",
       sources: sources.yak
     }
   }
@@ -521,8 +526,18 @@ function renderAdaptiveCard(message) {
           <button class="btn" data-action="go-channel" data-channel="${forwarded.toLowerCase()}">Open channel post</button>
         </div>
       ` : ""}
+      ${!status && !forwarded && card.autoForwardTo ? renderAutoForwardNote(card.autoForwardTo) : ""}
       ${card.sources?.length ? renderSources(card.sources) : ""}
     </section>
+  `;
+}
+
+function renderAutoForwardNote(username) {
+  return `
+    <div class="auto-forward-note">
+      ${clockIcon()}
+      <span>Auto-forwards to ${escapeHtml(username)} in 2 hours if unverified.</span>
+    </div>
   `;
 }
 
@@ -638,6 +653,7 @@ function renderChannelCard(post) {
           ${card.answerUnavailable ? "" : `<button class="btn" data-action="channel-correct" data-post-id="${post.id}">This is correct</button>`}
         </div>
       ` : ""}
+      ${!post.answered && card.autoForwardTo ? renderAutoForwardNote(card.autoForwardTo) : ""}
       ${card.sources?.length ? renderSources(card.sources) : ""}
     </section>
   `;
@@ -881,6 +897,14 @@ function teamsIcon() {
 
 function calendarIcon() {
   return fluentIcon("calendar");
+}
+
+function clockIcon() {
+  return `
+    <svg fill="currentColor" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20">
+      <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm0 1a7 7 0 1 1 0 14 7 7 0 0 1 0-14Zm.5 3.5a.5.5 0 0 0-1 0v4c0 .17.09.33.22.42l3 2a.5.5 0 1 0 .56-.84L10.5 10.23V6.5Z"/>
+    </svg>
+  `;
 }
 
 function callsIcon() {
