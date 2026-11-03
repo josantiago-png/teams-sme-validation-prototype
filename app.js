@@ -519,6 +519,7 @@ function renderAdaptiveCard(message) {
       </div>
       ${status ? renderStatus(status, card.check || confirmed) : ""}
       ${answer ? `<button class="reply-link" data-action="open-reply-thread" data-message-id="${message.id}">1 reply · Today at 10:50 AM</button>` : ""}
+      ${card.sources?.length ? renderSources(card.sources) : ""}
       ${!status && !forwarded && !card.noAnswer ? renderActions(message) : ""}
       ${forwarded && !status ? `
         <div class="forwarded-state">
@@ -527,7 +528,6 @@ function renderAdaptiveCard(message) {
         </div>
       ` : ""}
       ${!status && !forwarded && card.autoForwardTo ? renderAutoForwardNote(card.autoForwardTo) : ""}
-      ${card.sources?.length ? renderSources(card.sources) : ""}
     </section>
   `;
 }
@@ -647,6 +647,7 @@ function renderChannelCard(post) {
       </div>
       ${post.answered ? renderStatus("Answered by Giamir", false) : ""}
       ${post.replies?.length ? `<button class="reply-link" data-action="open-channel-thread" data-post-id="${post.id}">${post.replies.length} ${post.replies.length === 1 ? "reply" : "replies"} · Today at 10:52 AM</button>` : ""}
+      ${card.sources?.length ? renderSources(card.sources) : ""}
       ${!post.answered ? `
         <div class="card-actions">
           <button class="btn btn-primary" data-action="open-channel-thread" data-post-id="${post.id}">Answer in replies</button>
@@ -654,7 +655,6 @@ function renderChannelCard(post) {
         </div>
       ` : ""}
       ${!post.answered && card.autoForwardTo ? renderAutoForwardNote(card.autoForwardTo) : ""}
-      ${card.sources?.length ? renderSources(card.sources) : ""}
     </section>
   `;
 }
