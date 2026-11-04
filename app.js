@@ -125,6 +125,7 @@ const state = {
   modalMessageId: null,
   threadMessage: null,
   directAnswers: {},
+  answerReceipts: {},
   directCorrect: new Set(),
   forwarded: {},
   channelPosts: {
@@ -506,9 +507,10 @@ function renderPost(message) {
 function renderAdaptiveCard(message) {
   const card = message.card;
   const answered = state.directAnswers[message.id];
+  const answerReceipt = state.answerReceipts[message.id];
   const confirmed = state.directCorrect.has(message.id);
   const forwarded = state.forwarded[message.id];
-  const status = card.status ?? (answered ? "Answered by Giamir" : confirmed ? "Giamir marked this answer as correct" : "");
+  const status = card.status ?? (answered ? answerReceipt ?? "Answered by Giamir" : confirmed ? "Giamir marked this answer as correct" : "");
   const answer = card.answer ?? answered;
   return `
     <section class="adaptive-card" role="group" aria-label="Stack Internal adaptive card">
@@ -536,7 +538,7 @@ function renderAutoForwardNote(username) {
   return `
     <div class="auto-forward-note">
       ${clockIcon()}
-      <span>Auto-forwards to ${escapeHtml(username)} in 2 hours if unverified.</span>
+      <span>Auto-forwards to ${escapeHtml(username)} in 2 hours if unanswered.</span>
     </div>
   `;
 }
@@ -583,8 +585,8 @@ function renderActions(message) {
   const showCorrect = !message.card.answerUnavailable;
   return `
     <div class="card-actions">
-      <button class="btn btn-primary is-hidden-for-now" data-action="answer" data-message-id="${message.id}">${message.card.answerUnavailable ? "Answer" : "Answer"}</button>
-      ${showCorrect ? `<button class="btn" data-action="mark-correct" data-message-id="${message.id}">This is correct</button>` : ""}
+      <button class="btn btn-primary" data-action="answer" data-message-id="${message.id}">Answer</button>
+      ${showCorrect ? `<button class="btn btn-primary" data-action="mark-correct" data-message-id="${message.id}">This is correct</button>` : ""}
       <span class="forward-menu is-hidden-for-now">
         <button class="btn" data-action="toggle-forward" data-message-id="${message.id}">Forward to channel</button>
         ${state.forwardMenu === message.id ? renderForwardMenu(message.id) : ""}
@@ -651,7 +653,7 @@ function renderChannelCard(post) {
       ${!post.answered ? `
         <div class="card-actions">
           <button class="btn btn-primary" data-action="open-channel-thread" data-post-id="${post.id}">Answer in replies</button>
-          ${card.answerUnavailable ? "" : `<button class="btn" data-action="channel-correct" data-post-id="${post.id}">This is correct</button>`}
+          ${card.answerUnavailable ? "" : `<button class="btn btn-primary" data-action="channel-correct" data-post-id="${post.id}">This is correct</button>`}
         </div>
       ` : ""}
       ${!post.answered && card.autoForwardTo ? renderAutoForwardNote(card.autoForwardTo) : ""}
@@ -758,16 +760,17 @@ function renderComposer(placeholder) {
 
 function renderAnswerModal() {
   const message = smeMessages.find((item) => item.id === state.modalMessageId);
+  if (!message) return "";
+  const bodyLabel = message.card.bodyLabel ?? (message.card.answerUnavailable ? "Stack Internal response:" : "Suggested answer:");
   return `
     <div class="modal-backdrop">
       <div class="modal" role="dialog" aria-modal="true" aria-label="Answer question">
         <div class="modal-header">
           <h2 class="modal-title">${message.id === "yak" ? "Verify response" : "Answer question"}</h2>
-          <div class="time">${message.asker ?? "The asker"} will receive this in Stack Internal.</div>
         </div>
         <div class="modal-body">
           <p><strong>${message.card.titleLabel ?? "Question:"}</strong> ${escapeHtml(message.card.title)}</p>
-          <p><strong>${message.card.bodyLabel ?? "Suggested answer:"}</strong> ${escapeHtml(message.card.body)}</p>
+          <p><strong>${bodyLabel}</strong> ${escapeHtml(message.card.body)}</p>
           <label for="answer-input"><strong>Answer</strong></label>
           <textarea id="answer-input" class="answer-input" placeholder="Write your answer"></textarea>
         </div>
@@ -821,7 +824,9 @@ function forwardMessage(messageId, channelId) {
 
 function sendDirectAnswer(messageId, answer) {
   if (!answer.trim()) return;
+  const message = smeMessages.find((item) => item.id === messageId);
   state.directAnswers[messageId] = answer.trim();
+  state.answerReceipts[messageId] = `Your answer was sent to ${message?.asker ?? "the asker"}`;
   state.modalMessageId = null;
 }
 

@@ -43,7 +43,6 @@ button {
   display: none !important;
 }
 
-.card-actions [data-action="answer"],
 .card-actions .forward-menu,
 .card-actions [data-action="view-context"] {
   display: none !important;
