@@ -764,9 +764,9 @@ function renderAnswerModal() {
   const bodyLabel = message.card.bodyLabel ?? (message.card.answerUnavailable ? "Stack Internal response:" : "Suggested answer:");
   return `
     <div class="modal-backdrop">
-      <div class="modal" role="dialog" aria-modal="true" aria-label="Answer question">
+      <div class="modal" role="dialog" aria-modal="true" aria-label="Answer ${escapeHtml(message.asker ?? "question")}">
         <div class="modal-header">
-          <h2 class="modal-title">${message.id === "yak" ? "Verify response" : "Answer question"}</h2>
+          <h2 class="modal-title">Answer ${escapeHtml(message.asker ?? "question")}</h2>
         </div>
         <div class="modal-body">
           <p><strong>${message.card.titleLabel ?? "Question:"}</strong> ${escapeHtml(message.card.title)}</p>
@@ -776,7 +776,7 @@ function renderAnswerModal() {
         </div>
         <div class="modal-footer">
           <button class="btn" data-action="close-modal">Cancel</button>
-          <button class="btn btn-primary" data-action="send-direct-answer" data-message-id="${message.id}">Send answer</button>
+          <button class="btn btn-primary" data-action="send-direct-answer" data-message-id="${message.id}">Send</button>
         </div>
       </div>
     </div>
